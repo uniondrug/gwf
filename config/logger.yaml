@@ -1,0 +1,9 @@
+#
+# Configuration for x-log.
+# adapter-name: terminal|file|redis
+# level-name: DEBUG|INFO|WARN|ERROR|ALERT
+# time-format:
+#
+adapter-name: "term"
+level-name: "DEBUG"
+time-format: "2006-01-02 15:04:05.999"
