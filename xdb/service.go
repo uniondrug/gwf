@@ -7,12 +7,23 @@ import (
 	"xorm.io/xorm"
 )
 
-// Service结构.
+// Boot service.
+//
+//   type ExampleService struct{
+//       xdb.Service
+//   }
+//
+//   func NewExampleService(s ...*xorm.Session) *ExampleService {
+//       o := &ExampleService{}
+//       o.Use(s...)
+//       return o
+//   }
+//
 type Service struct {
 	sess *xorm.Session
 }
 
-// 获取主库连结.
+// Read master connection session.
 func (o *Service) Master() *xorm.Session {
 	if o.sess == nil {
 		return Config.engines.Master().NewSession()
@@ -20,7 +31,7 @@ func (o *Service) Master() *xorm.Session {
 	return o.sess
 }
 
-// 获取从库连结.
+// Read slave connection session.
 func (o *Service) Slave() *xorm.Session {
 	if o.sess == nil {
 		return Config.engines.Slave().NewSession()
@@ -28,7 +39,7 @@ func (o *Service) Slave() *xorm.Session {
 	return o.sess
 }
 
-// 使用指定连结.
+// Bind session use New method.
 func (o *Service) Use(s ...*xorm.Session) {
 	if s != nil && len(s) > 0 {
 		o.sess = s[0]

@@ -32,19 +32,23 @@ func (o *TermLogAdapter) Handler(line *Line) {
 
 // 按级别设置颜色.
 func (o *TermLogAdapter) color(line *Line) string {
-	if c, ok := o.colors[line.level]; ok {
+	if c, ok := o.colors[line.Level]; ok {
 		return fmt.Sprintf("%c[%d;%d;%dm[%5s]%c[0m",
 			0x1B, 0,
 			c[1], c[0],
-			Config.LevelText(line.level),
+			Config.LevelText(line.Level),
 			0x1B,
 		)
 	}
-	return fmt.Sprintf("[%5s]", Config.LevelText(line.level))
+	return fmt.Sprintf("[%5s]", Config.LevelText(line.Level))
 }
 
 // 格式化文本.
 func (o *TermLogAdapter) format(line *Line) string {
-	s := fmt.Sprintf("%s", o.color(line)) + " " + line.Message()
+	s := fmt.Sprintf("%s", o.color(line))
+	if line.SpanId != "" {
+		s += fmt.Sprintf("[s=%s][v=%s]", line.SpanId, line.SpanVersion)
+	}
+	s += " " + line.Message()
 	return s
 }

@@ -4,7 +4,6 @@
 package tests
 
 import (
-	"encoding/json"
 	"testing"
 
 	"xorm.io/xorm"
@@ -45,14 +44,22 @@ func (o *ExampleService) GetById(id int) (*Example, error) {
 }
 
 func TestXDb(t *testing.T) {
-	se := NewExampleService()
-	m, err := se.GetById(5)
-	if err != nil {
-		xlog.Errorf("service error - %s", err)
-		return
+
+	ss := xdb.MasterContext(nil)
+
+	if se, _ := xdb.TransactionWithSession(ss, func(sess *xorm.Session) error {
+		se := NewExampleService(ss)
+		_, err := se.GetById(4)
+		return err
+	}, func(sess *xorm.Session) error {
+		NewExampleService(sess).GetById(5)
+		return nil
+	}, func(sess *xorm.Session) error {
+		NewExampleService(sess).GetById(6)
+		return nil
+	}); se != nil {
+		xlog.Errorf("transaction error - %s", se)
 	}
 
-	s, _ := json.Marshal(m)
-	xlog.Infof("service response - %s", s)
 
 }

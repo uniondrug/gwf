@@ -5,18 +5,21 @@
 package xdb
 
 import (
+	"context"
 	"sync"
 
 	"gwf/xlog"
 )
 
 var (
-	Config *configuration
+	Config      *configuration
+	rootContext context.Context
 )
 
 func init() {
 	new(sync.Once).Do(func() {
-		xlog.Info("[GWF][SERVICE] initialize.")
+		rootContext = context.Background()
+		xlog.Info("initialize golang framework service.")
 		Config = new(configuration)
 		Config.onInit()
 	})

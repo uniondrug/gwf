@@ -8,4 +8,3 @@ max-idle: 30
 max-open: 300
 max-lifetime: 60
 mapper: "same"
-show-sql: false

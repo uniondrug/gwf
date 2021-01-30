@@ -3,111 +3,40 @@
 
 package xlog
 
-var (
-	enableDebug = false
-	enableInfo  = false
-	enableWarn  = false
-	enableError = false
-	enableAlert = false
+import (
+	"fmt"
+
+	"xorm.io/xorm/log"
 )
 
-// 日志结构.
-type Logger struct{}
+type XDBLogger struct{}
 
-func (o *Logger) Debug(text string) {
-	if enableDebug {
-		Config.log(nil, DebugLevel, text)
+func (o *XDBLogger) Debugf(format string, v ...interface{}) {}
+func (o *XDBLogger) Errorf(format string, v ...interface{}) {}
+func (o *XDBLogger) Infof(format string, v ...interface{})  {}
+func (o *XDBLogger) Warnf(format string, v ...interface{})  {}
+func (o *XDBLogger) Level() log.LogLevel                    { return log.LOG_INFO }
+func (o *XDBLogger) SetLevel(l log.LogLevel)                {}
+func (o *XDBLogger) ShowSQL(show ...bool)                   {}
+func (o *XDBLogger) IsShowSQL() bool                        { return true }
+func (o *XDBLogger) BeforeSQL(c log.LogContext)             {}
+func (o *XDBLogger) AfterSQL(c log.LogContext) {
+	var ctx *Tracing
+	if c.Ctx != nil {
+		if x := c.Ctx.Value(OpenTracing); x != nil {
+			ctx, _ = x.(*Tracing)
+		}
 	}
-}
-
-func (o *Logger) Debugf(format string, args ...interface{}) {
-	if enableDebug {
-		Config.log(nil, DebugLevel, format, args...)
-	}
-}
-
-func (o *Logger) Debugfc(ctx interface{}, format string, args ...interface{}) {
-	if enableDebug {
-		Config.log(ctx, DebugLevel, format, args...)
-	}
-}
-
-func (o *Logger) Info(text string) {
+	// add INFO log.
 	if enableInfo {
-		Config.log(nil, InfoLevel, text)
+		if c.Args != nil && len(c.Args) > 0 {
+			Config.log(ctx, InfoLevel, fmt.Sprintf("[SQL][d=%f] %s - %v.", c.ExecuteTime.Seconds(), c.SQL, c.Args))
+		} else {
+			Config.log(ctx, InfoLevel, fmt.Sprintf("[SQL][d=%f] %s.", c.ExecuteTime.Seconds(), c.SQL))
+		}
 	}
-}
-
-func (o *Logger) Infof(format string, args ...interface{}) {
-	if enableInfo {
-		Config.log(nil, InfoLevel, format, args...)
+	// add ERROR log.
+	if c.Err != nil && enableError {
+		Config.log(ctx, ErrorLevel, fmt.Sprintf("[SQL] %s.", c.Err.Error()))
 	}
-}
-
-func (o *Logger) Infofc(ctx interface{}, format string, args ...interface{}) {
-	if enableInfo {
-		Config.log(ctx, InfoLevel, format, args...)
-	}
-}
-
-func (o *Logger) Warn(text string) {
-	if enableWarn {
-		Config.log(nil, WarnLevel, text)
-	}
-}
-
-func (o *Logger) Warnf(format string, args ...interface{}) {
-	if enableWarn {
-		Config.log(nil, WarnLevel, format, args...)
-	}
-}
-
-func (o *Logger) Warnfc(ctx interface{}, format string, args ...interface{}) {
-	if enableWarn {
-		Config.log(ctx, WarnLevel, format, args...)
-	}
-}
-
-func (o *Logger) Error(text string) {
-	if enableError {
-		Config.log(nil, ErrorLevel, text)
-	}
-}
-
-func (o *Logger) Errorf(format string, args ...interface{}) {
-	if enableError {
-		Config.log(nil, ErrorLevel, format, args...)
-	}
-}
-
-func (o *Logger) Errorfc(ctx interface{}, format string, args ...interface{}) {
-	if enableError {
-		Config.log(ctx, ErrorLevel, format, args...)
-	}
-}
-
-func (o *Logger) Alert(text string) {
-	if enableAlert {
-		Config.log(nil, AlertLevel, text)
-	}
-}
-
-func (o *Logger) Alertf(format string, args ...interface{}) {
-	if enableAlert {
-		Config.log(nil, AlertLevel, format, args...)
-	}
-}
-
-func (o *Logger) Alertfc(ctx interface{}, format string, args ...interface{}) {
-	if enableAlert {
-		Config.log(ctx, AlertLevel, format, args...)
-	}
-}
-
-func (o *Logger) Level() LogLevel {
-	return Config.Level()
-}
-
-func (o *Logger) SetLevel(level LogLevel) {
-	Config.SetLevel(level)
 }

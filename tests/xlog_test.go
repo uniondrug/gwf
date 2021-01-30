@@ -29,3 +29,10 @@ func TestLogger(t *testing.T) {
 
 	time.Sleep(time.Second)
 }
+
+func TestLoggerForTracing(t *testing.T) {
+	trace := xlog.NewTracing().FromRoot()
+	data,_ := json.Marshal(trace)
+	println("trace: ", string(data))
+
+}

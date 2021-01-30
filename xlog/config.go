@@ -11,31 +11,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// 配置接口.
-type Configuration interface {
-	// 导出方法.
-	Level() LogLevel
-	LevelText(level LogLevel) string
-	LoadYaml(path string) error
-	SetAdapter(adapter LogAdapter)
-	SetHandler(handler func(line *Line))
-	SetLevel(level LogLevel)
-	SetTimeFormat(timeFormat string)
-	// 包内方法.
-	log(ctx interface{}, level LogLevel, format string, args ...interface{})
-	onInit()
-	listen()
-}
-
 // 日志配置.
 type configuration struct {
-	AdapterName string `yaml:"adapter-name"`
-	LevelName   string `yaml:"level-name"`
-	TimeFormat  string `yaml:"time-format"`
-	adapter     LogAdapter
-	handler     func(line *Line)
-	level       LogLevel
-	ch          chan *Line
+	AdapterName  string `yaml:"adapter-name"`
+	LevelName    string `yaml:"level-name"`
+	TimeFormat   string `yaml:"time-Format"`
+	ParentSpanId string `yaml:"parent-span-id"`
+	SpanId       string `yaml:"span-id"`
+	SpanVersion  string `yaml:"span-version"`
+	TraceId      string `yaml:"trace-id"`
+	adapter      LogAdapter
+	handler      func(line *Line)
+	level        LogLevel
+	ch           chan *Line
 }
 
 // 读取日志级别.
@@ -73,7 +61,7 @@ func (o *configuration) LoadYaml(path string) error {
 			}
 		}
 		if lf {
-			panic(fmt.Sprintf("unknown log level `%s` defined logger.yaml", o.LevelName))
+			panic(fmt.Sprintf("unknown log Level `%s` defined logger.yaml", o.LevelName))
 		}
 	} else {
 		o.LevelName = LevelText[o.level]
@@ -153,6 +141,10 @@ func (o *configuration) log(ctx interface{}, level LogLevel, format string, args
 // 在包的init方法中触发.
 func (o *configuration) onInit() {
 	o.ch = make(chan *Line)
+	o.ParentSpanId = OpenTracingParentSpanId
+	o.SpanId = OpenTracingSpanId
+	o.SpanVersion = OpenTracingSpanVersion
+	o.TraceId = OpenTracingTraceId
 	// default fields.
 	o.SetAdapter(DefaultAdapter)
 	o.SetLevel(DefaultLevel)

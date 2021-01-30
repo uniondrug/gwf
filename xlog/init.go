@@ -31,13 +31,18 @@ const (
 
 // 转让配置.
 const (
-	DefaultAdapter    = TermAdapter
-	DefaultLevel      = InfoLevel
-	DefaultTimeFormat = "2006-01-02 15:04:05.999999"
+	DefaultAdapter          = TermAdapter
+	DefaultLevel            = InfoLevel
+	DefaultTimeFormat       = "2006-01-02 15:04:05.999999"
+	OpenTracing             = "OpenTracingHandler"
+	OpenTracingParentSpanId = "X-B3-Parentspanid"
+	OpenTracingSpanId       = "X-B3-Spanid"
+	OpenTracingSpanVersion  = "Version"
+	OpenTracingTraceId      = "X-B3-Traceid"
 )
 
 var (
-	Config Configuration
+	Config *configuration
 	// 适配器定义.
 	AdapterText = map[LogAdapter]string{
 		TermAdapter:  "term",

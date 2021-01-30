@@ -3,6 +3,14 @@
 
 package xlog
 
+var (
+	enableDebug = false
+	enableInfo  = false
+	enableWarn  = false
+	enableError = false
+	enableAlert = false
+)
+
 func Debug(text string) {
 	if enableDebug {
 		Config.log(nil, DebugLevel, text)
