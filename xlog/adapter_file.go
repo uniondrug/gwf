@@ -3,13 +3,13 @@
 
 package xlog
 
-// 文件模式.
+// File adapter.
 type FileLogAdapter struct{}
 
-// 创建文件模式结构体.
+// New file adapter struct.
 func NewFileLogAdapter() *FileLogAdapter {
 	return &FileLogAdapter{}
 }
 
-// 文件模式回调.
+// File adapter handler.
 func (o *FileLogAdapter) Handler(line *Line) {}

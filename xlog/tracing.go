@@ -15,7 +15,7 @@ import (
 	"github.com/kataras/iris/v12"
 )
 
-// 请求链.
+// Tracing struct.
 type Tracing struct {
 	offset       int32
 	parentSpanId string
@@ -24,7 +24,7 @@ type Tracing struct {
 	traceId      string
 }
 
-// 创建请求链结构体.
+// Create tracing struct.
 func NewTracing() *Tracing {
 	tracing := &Tracing{offset: 0, spanVersion: "0"}
 	tracing.spanId = tracing.UUID()
@@ -32,29 +32,29 @@ func NewTracing() *Tracing {
 	return tracing
 }
 
-// Offset偏移量+1.
+// Increment offset.
 func (o *Tracing) Increment() int32 {
 	i := o.offset
 	atomic.AddInt32(&o.offset, 1)
 	return i
 }
 
-// 上级链路标识.
+// Parent span id.
 func (o *Tracing) ParentSpanId() string {
 	return o.parentSpanId
 }
 
-// 本级链路标识.
+// Current span id.
 func (o *Tracing) SpanId() string {
 	return o.spanId
 }
 
-// 本级链路版本.
+// Current span version.
 func (o *Tracing) SpanVersion() string {
 	return o.spanVersion
 }
 
-// 获取UUID.
+// Return unique identify.
 func (o *Tracing) UUID() string {
 	// 1. 通过UUID包获取.
 	if u, e := uuid.NewUUID(); e == nil {
@@ -65,24 +65,24 @@ func (o *Tracing) UUID() string {
 	return fmt.Sprintf("a%d%d%d", t.Unix(), t.UnixNano(), rand.Int63n(999999999999))
 }
 
-// 向Request追加.
+// Assign to request.
 func (o *Tracing) AssignRequest(req *http.Request, offset int) {
 	req.Header.Set(Config.ParentSpanId, o.parentSpanId)
 	req.Header.Set(Config.TraceId, o.traceId)
 	req.Header.Set(Config.SpanVersion, fmt.Sprintf("%s.%d", o.spanVersion, offset))
 }
 
-// 向Response追加.
+// Assign to response.
 func (o *Tracing) AssignResponse(req iris.Context) {
 	req.ResponseWriter().Header().Set(Config.TraceId, o.traceId)
 }
 
-// 基于IRIS.
-func (o *Tracing) FromIris(req iris.Context) *Tracing {
-	return o.FromRequest(req.Request())
+// Trace from iris.
+func (o *Tracing) FromIris(ctx iris.Context) *Tracing {
+	return o.FromRequest(ctx.Request())
 }
 
-// 基于HTTP请求.
+// Trace form http request.
 func (o *Tracing) FromRequest(req *http.Request) *Tracing {
 	// 读取TraceID, 如为空则使用SpanId.
 	if s := req.Header.Get(Config.TraceId); s != "" {
@@ -101,7 +101,7 @@ func (o *Tracing) FromRequest(req *http.Request) *Tracing {
 	return o
 }
 
-// 生成根链路.
+// Trace from root.
 func (o *Tracing) FromRoot() *Tracing {
 	o.traceId = o.spanId
 	return o

@@ -66,6 +66,5 @@ func init() {
 	new(sync.Once).Do(func() {
 		Config = new(configuration)
 		Config.onInit()
-		Config.listen()
 	})
 }

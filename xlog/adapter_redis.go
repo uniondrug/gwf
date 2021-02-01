@@ -3,13 +3,13 @@
 
 package xlog
 
-// Redis模式.
+// Redis adapter.
 type RedisLogAdapter struct{}
 
-// 创建Redis结构体.
+// New redis adapter struct.
 func NewRedisLogAdapter() *RedisLogAdapter {
 	return &RedisLogAdapter{}
 }
 
-// Redis结构体回调.
+// Redis adapter handler.
 func (o *RedisLogAdapter) Handler(line *Line) {}

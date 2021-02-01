@@ -7,7 +7,8 @@ import (
 	"xorm.io/xorm"
 )
 
-// Boot service.
+// 根服务.
+// 在Service中以匿名方式引入.
 //
 //   type ExampleService struct{
 //       xdb.Service
@@ -23,7 +24,8 @@ type Service struct {
 	sess *xorm.Session
 }
 
-// Read master connection session.
+// 获取主库连接.
+// 在写方法(INSERT、UPDATE、DELETE)中调用此连接.
 func (o *Service) Master() *xorm.Session {
 	if o.sess == nil {
 		return Config.engines.Master().NewSession()
@@ -31,7 +33,8 @@ func (o *Service) Master() *xorm.Session {
 	return o.sess
 }
 
-// Read slave connection session.
+// 获取从库连接.
+// 在读方法(SELECT)中调用此连接.
 func (o *Service) Slave() *xorm.Session {
 	if o.sess == nil {
 		return Config.engines.Slave().NewSession()
@@ -39,7 +42,8 @@ func (o *Service) Slave() *xorm.Session {
 	return o.sess
 }
 
-// Bind session use New method.
+// 指定连接.
+// 通过在事务中使用指定连接.
 func (o *Service) Use(s ...*xorm.Session) {
 	if s != nil && len(s) > 0 {
 		o.sess = s[0]

@@ -14,7 +14,9 @@ import (
 	"gwf/xlog"
 )
 
-// Return context for xdb, cross tracing.
+// 向Session注入Context上下文.
+// param sess is XORM connection session.
+// param x accept xdb.Tracing, iris.Context, context.Context.
 func Context(sess *xorm.Session, x interface{}) {
 	// use *Tracing for cross.
 	if t1, o1 := x.(*xlog.Tracing); o1 && t1 != nil {
@@ -43,59 +45,42 @@ func Context(sess *xorm.Session, x interface{}) {
 	sess.Context(context.WithValue(rootContext, xlog.OpenTracing, xlog.NewTracing().FromRoot()))
 }
 
-// Return master connection session.
+// 读取主库连接.
 func Master() *xorm.Session {
 	return Config.engines.Master().NewSession()
 }
 
-// Return master connection session and set context.
+// 读取主库连接.
 func MasterContext(ctx interface{}) *xorm.Session {
 	sess := Master()
 	Context(sess, ctx)
 	return sess
 }
 
-// Return slave connection session.
+// 读取从库连接.
 func Slave() *xorm.Session {
 	return Config.engines.Slave().NewSession()
 }
 
-// Return slave connection session and set context.
+// 读取从库连接.
 func SlaveContext(ctx interface{}) *xorm.Session {
 	sess := Slave()
 	Context(sess, ctx)
 	return sess
 }
 
-// Transaction.
-//
-//   if err, done := xdb.TransactionWithSession(func(sess *xorm.Session) error {
-//
-//       // logic
-//
-//   }, func(sess *xorm.Session) error {
-//
-//       // logic
-//
-//   }, func(sess *xorm.Session) error {
-//
-//       // logic
-//
-//   }); err != nil {
-//
-//       println("Transaction error - ", err.Error())
-//       println("Rollback status - ", done)
-//
-//   }
-//
+// 执行事务.
 func Transaction(handlers ...func(sess *xorm.Session) error) (err error, done bool) {
 	return TransactionWithSession(nil, handlers...)
 }
 
-// Transaction with session.
+// 执行事务.
 //
-// 1st returned param - rollback or not executed if error returned.
-// 2nd returned param - commit or rollback status.
+// 在事务中必须保证使用同一个连接, 且各回调以串行方式执行.
+//
+// err - 执行执行不成功时, 返回error类型结构, 反之正常执行.
+//
+// done - 事务commit/rollback状态.
 //
 //   sess := xdb.Master()
 //

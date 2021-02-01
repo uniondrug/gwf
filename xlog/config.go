@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// 日志配置.
+// XLog configuration.
 type configuration struct {
 	AdapterName  string `yaml:"adapter-name"`
 	LevelName    string `yaml:"level-name"`
@@ -20,18 +20,18 @@ type configuration struct {
 	SpanId       string `yaml:"span-id"`
 	SpanVersion  string `yaml:"span-version"`
 	TraceId      string `yaml:"trace-id"`
-	adapter      LogAdapter
-	handler      func(line *Line)
-	level        LogLevel
-	ch           chan *Line
+	// access.
+	adapter LogAdapter
+	handler func(line *Line)
+	level   LogLevel
 }
 
-// 读取日志级别.
+// Return current log level.
 func (o *configuration) Level() LogLevel {
 	return o.level
 }
 
-// 级别名称.
+// Return current log level text.
 func (o *configuration) LevelText(level LogLevel) string {
 	if s, ok := LevelText[level]; ok {
 		return s
@@ -39,7 +39,7 @@ func (o *configuration) LevelText(level LogLevel) string {
 	return ""
 }
 
-// 从YAML文件读取配置.
+// Load config from yaml file.
 func (o *configuration) LoadYaml(path string) error {
 	data, err := ioutil.ReadFile(path)
 	// 1. 读取文件出错.
@@ -85,7 +85,7 @@ func (o *configuration) LoadYaml(path string) error {
 	return nil
 }
 
-// 设置适配器.
+// Set log adapter.
 func (o *configuration) SetAdapter(adapter LogAdapter) {
 	o.adapter = adapter
 	switch adapter {
@@ -98,12 +98,12 @@ func (o *configuration) SetAdapter(adapter LogAdapter) {
 	}
 }
 
-// 设置回调.
+// Set handler.
 func (o *configuration) SetHandler(handler func(line *Line)) {
 	o.handler = handler
 }
 
-// 设置级别.
+// Set log level.
 func (o *configuration) SetLevel(level LogLevel) {
 	o.level = level
 	enableDebug = level >= DebugLevel
@@ -113,22 +113,9 @@ func (o *configuration) SetLevel(level LogLevel) {
 	enableAlert = level >= AlertLevel
 }
 
-// 设置时间格式.
+// Set time format.
 func (o *configuration) SetTimeFormat(timeFormat string) {
 	o.TimeFormat = timeFormat
-}
-
-// 初始化Channel.
-func (o *configuration) listen() {
-	go func() {
-		defer o.listen()
-		for {
-			select {
-			case x := <-o.ch:
-				go o.handler(x)
-			}
-		}
-	}()
 }
 
 // 发送日志.
@@ -140,7 +127,6 @@ func (o *configuration) log(ctx interface{}, level LogLevel, format string, args
 
 // 在包的init方法中触发.
 func (o *configuration) onInit() {
-	o.ch = make(chan *Line)
 	o.ParentSpanId = OpenTracingParentSpanId
 	o.SpanId = OpenTracingSpanId
 	o.SpanVersion = OpenTracingSpanVersion

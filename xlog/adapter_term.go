@@ -7,12 +7,12 @@ import (
 	"fmt"
 )
 
-// 终端模式.
+// Terminal adapter.
 type TermLogAdapter struct {
 	colors map[LogLevel][]int
 }
 
-// 创建终端结构体.
+// New terminal adapter.
 func NewTermLogAdapter() *TermLogAdapter {
 	return &TermLogAdapter{
 		colors: map[LogLevel][]int{
@@ -25,12 +25,12 @@ func NewTermLogAdapter() *TermLogAdapter {
 	}
 }
 
-// 终端结构体回调.
+// Terminal adapter handler.
 func (o *TermLogAdapter) Handler(line *Line) {
 	println(o.format(line))
 }
 
-// 按级别设置颜色.
+// Render text color.
 func (o *TermLogAdapter) color(line *Line) string {
 	if c, ok := o.colors[line.Level]; ok {
 		return fmt.Sprintf("%c[%d;%d;%dm[%5s]%c[0m",
@@ -43,7 +43,7 @@ func (o *TermLogAdapter) color(line *Line) string {
 	return fmt.Sprintf("[%5s]", Config.LevelText(line.Level))
 }
 
-// 格式化文本.
+// Format terminal string.
 func (o *TermLogAdapter) format(line *Line) string {
 	s := fmt.Sprintf("%s", o.color(line))
 	if line.SpanId != "" {

@@ -52,6 +52,8 @@ func TestXDb(t *testing.T) {
 		_, err := se.GetById(4)
 		return err
 	}, func(sess *xorm.Session) error {
+		panic("panic transaction")
+	}, func(sess *xorm.Session) error {
 		NewExampleService(sess).GetById(5)
 		return nil
 	}, func(sess *xorm.Session) error {
