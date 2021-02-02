@@ -14,35 +14,32 @@ import (
 	"gwf/xlog"
 )
 
+type TransactionHandler func(ctx interface{}, sess *xorm.Session) error
+
 // 向Session注入Context上下文.
 // param sess is XORM connection session.
 // param x accept xdb.Tracing, iris.Context, context.Context.
 func Context(sess *xorm.Session, x interface{}) {
-	// use *Tracing for cross.
-	if t1, o1 := x.(*xlog.Tracing); o1 && t1 != nil {
-		sess.Context(context.WithValue(rootContext, xlog.OpenTracing, t1))
+	// create if nil.
+	if x == nil {
+		sess.Context(context.WithValue(rootContext, xlog.OpenTracing, xlog.NewTracing().UseDefault()))
 		return
 	}
-	// use iris.Context.
-	if i2, o2 := x.(iris.Context); o2 && i2 != nil {
-		if g2 := i2.Values().Get(xlog.OpenTracing); g2 != nil {
-			if t2, ok := g2.(*xlog.Tracing); ok && t2 != nil {
-				sess.Context(context.WithValue(rootContext, xlog.OpenTracing, t2))
-				return
-			}
-		}
+	// xlog.Tracing.
+	if t, ok := x.(*xlog.Tracing); ok && t != nil {
+		sess.Context(context.WithValue(rootContext, xlog.OpenTracing, t))
+		return
 	}
-	// use context.Context.
-	if i3, o3 := x.(context.Context); o3 && i3 != nil {
-		if g3 := i3.Value(xlog.OpenTracing); g3 != nil {
-			if t3, ok := g3.(*xlog.Tracing); ok && t3 != nil {
-				sess.Context(context.WithValue(rootContext, xlog.OpenTracing, t3))
-				return
-			}
-		}
+	// iris.Context.
+	if c, ok := x.(iris.Context); ok && c != nil {
+		sess.Context(context.WithValue(rootContext, xlog.OpenTracing, c.Values().Get(xlog.OpenTracing)))
+		return
 	}
-	// use DEFAULT.
-	sess.Context(context.WithValue(rootContext, xlog.OpenTracing, xlog.NewTracing().FromRoot()))
+	// context.Context.
+	if c, ok := x.(context.Context); ok && c != nil {
+		sess.Context(c)
+		return
+	}
 }
 
 // 读取主库连接.
@@ -70,76 +67,63 @@ func SlaveContext(ctx interface{}) *xorm.Session {
 }
 
 // 执行事务.
-func Transaction(handlers ...func(sess *xorm.Session) error) (err error, done bool) {
-	return TransactionWithSession(nil, handlers...)
+func Transaction(ctx interface{}, handlers ...TransactionHandler) (err error) {
+	return TransactionWithSession(ctx, nil, handlers...)
 }
 
 // 执行事务.
 //
 // 在事务中必须保证使用同一个连接, 且各回调以串行方式执行.
 //
-// err - 执行执行不成功时, 返回error类型结构, 反之正常执行.
+// err - 执行不成功, 返回error类型结构, 反之正常执行.
 //
-// done - 事务commit/rollback状态.
-//
-//   sess := xdb.Master()
-//
-//   if err, done := xdb.TransactionWithSession(sess, func(sess *xorm.Session) error {
-//
+//   tracing := xdb.Master()
+//   sess := xdb.MasterContext(tracing)
+//   if err := xdb.TransactionWithSession(tracing, sess, func(ctx interface{}, sess *xorm.Session) error {
 //       // logic
-//
 //   }, func(sess *xorm.Session) error {
-//
 //       // logic
-//
 //   }, func(sess *xorm.Session) error {
-//
 //       // logic
-//
 //   }); err != nil {
-//
 //       println("Transaction error - ", err.Error())
-//       println("Rollback status - ", done)
-//
 //   }
 //
-func TransactionWithSession(sess *xorm.Session, handlers ...func(sess *xorm.Session) error) (err error, done bool) {
-	// open master session if not specified.
+func TransactionWithSession(ctx interface{}, sess *xorm.Session, handlers ...TransactionHandler) (err error) {
+	// 校验连接.
+	// 若未指定连接, 则自动选择主库连接.
 	if sess == nil {
 		sess = Master()
-		if sess == nil {
-			err = errors.New("can not get master connection session")
-			return
-		}
 	}
-	// ping connection.
+	// 校验状态.
 	if err = sess.Ping(); err != nil {
 		return
 	}
-	// begin transaction.
+	// 打开事务.
 	if err = sess.Begin(); err != nil {
 		return
 	}
-	// invoke when handlers executed.
+	// 完成事务.
 	defer func() {
-		// reset error if panic fired.
+		// 捕获异常.
 		if r := recover(); r != nil {
 			err = errors.New(fmt.Sprintf("%v", r))
 		}
-		// rollback.
+		// 结束事务.
 		if err != nil {
-			done = sess.Rollback() == nil
+			// 回滚事务.
+			_ = sess.Rollback()
 		} else {
-			done = sess.Commit() == nil
+			// 提交事务.
+			_ = sess.Commit()
 		}
 	}()
-	// loop handlers.
-	// break if error returned when handler execute.
+	// 遍历.
 	for _, handler := range handlers {
-		if err = handler(sess); err != nil {
+		if err = handler(ctx, sess); err != nil {
 			break
 		}
 	}
-	// end loop
+	// 结束.
 	return
 }

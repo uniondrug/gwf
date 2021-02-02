@@ -1,15 +1,16 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2021-01-30
+// date: 2021-02-01
 
 package xlog
 
-// File adapter.
-type FileLogAdapter struct{}
+// 文件适配器.
+type AdapterFileHandler struct{}
 
-// New file adapter struct.
-func NewFileLogAdapter() *FileLogAdapter {
-	return &FileLogAdapter{}
+// 创建文件适配器结构体.
+func NewAdapterFileHandler() *AdapterFileHandler {
+	o := &AdapterFileHandler{}
+	return o
 }
 
-// File adapter handler.
-func (o *FileLogAdapter) Handler(line *Line) {}
+// 指定Handler回调.
+func (o *AdapterFileHandler) Handler(line *Line) {}

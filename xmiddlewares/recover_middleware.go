@@ -10,7 +10,7 @@ import (
 
 	"github.com/kataras/iris/v12"
 
-	"gwf/xlog"
+	"gwf/xlog2"
 )
 
 // Catch panic.
@@ -31,7 +31,7 @@ func RecoverMiddleware(ctx iris.Context) {
 			}
 			sta += fmt.Sprintf("%s:%d\n", f, l)
 		}
-		xlog.Errorfc(ctx, msg+"\n"+sta)
+		xlog2.Errorfc(ctx, msg+"\n"+sta)
 		ctx.StatusCode(http.StatusInternalServerError)
 		ctx.StopExecution()
 	}()

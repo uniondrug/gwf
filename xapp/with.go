@@ -9,15 +9,30 @@ import (
 
 // 返回数据结构.
 func WithData(ctx iris.Context, data interface{}) interface{} {
-	return nil
+	return iris.Map{
+		"errno":    0,
+		"error":    "",
+		"data":     data,
+		"dataType": "OBJECT",
+	}
 }
 
 // 返回错误结构.
 func WithError(ctx iris.Context, code int, err error) interface{} {
-	return nil
+	return iris.Map{
+		"errno":    code,
+		"error":    err.Error(),
+		"data":     iris.Map{},
+		"dataType": "ERROR",
+	}
 }
 
 // 输出列表结构.
 func WithList(ctx iris.Context, list interface{}) interface{} {
-	return nil
+	return iris.Map{
+		"errno":    0,
+		"error":    "",
+		"data":     list,
+		"dataType": "LIST",
+	}
 }

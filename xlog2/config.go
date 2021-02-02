@@ -1,7 +1,7 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2021-01-29
 
-package xlog
+package xlog2
 
 import (
 	"fmt"

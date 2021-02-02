@@ -1,77 +1,90 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2021-01-29
+// date: 2021-02-01
 
 package xlog
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/kataras/iris/v12"
 )
 
-// 单条日志.
+// 日志行记录.
 type Line struct {
-	ctx         interface{}
-	Args        []interface{}
-	Format      string
-	Level       LogLevel
-	Time        time.Time
-	SpanId      string
-	SpanVersion string
+	Args          []interface{}
+	Ctx           interface{}
+	Format        string
+	Time          time.Time
+	Level         LogLevel
+	Tracing       *Tracing
+	TracingOffset int32
 }
 
-// 创建日志记录.
+// 创建日志行记录.
 func NewLine(ctx interface{}, level LogLevel, format string, args ...interface{}) *Line {
-	line := &Line{Args: args, ctx: ctx, Format: format, Level: level, Time: time.Now()}
+	line := &Line{Args: args, Ctx: ctx, Format: format, Level: level, Time: time.Now()}
 	line.parse()
 	return line
 }
 
-// 日志内容.
-func (o *Line) Message() string {
-	if o.Args != nil && len(o.Args) > 0 {
-		return fmt.Sprintf(o.Format, o.Args...)
-	}
-	return o.Format
-}
-
-// 解析Context.
+// 解析Ctx.
 func (o *Line) parse() {
-	// 1. 未绑定Context
-	if o.ctx == nil {
+	// 空Ctx.
+	if o.Ctx == nil {
 		return
 	}
-	// 2. 标准Tracing
-	if t1, o1 := o.ctx.(*Tracing); o1 && t1 != nil {
-		o.parseTracing(t1)
+	// 校验 iris.Context.
+	if o.parseWithIrisContext() {
 		return
 	}
-	// 3. 标准context.Context.
-	if c2, o2 := o.ctx.(context.Context); o2 {
-		x2 := c2.Value(OpenTracing)
-		if x2 != nil {
-			if t2, o21 := x2.(*Tracing); o21 && t2 != nil {
-				o.parseTracing(t2)
-			}
-		}
+	// 校验 context.Context.
+	if o.parseWithContext() {
 		return
 	}
-	// 4. 标准iris.Context.
-	if c3, o3 := o.ctx.(iris.Context); o3 {
-		x3 := c3.Values().Get(OpenTracing)
-		if x3 != nil {
-			if t3, o31 := x3.(*Tracing); o31 && t3 != nil {
-				o.parseTracing(t3)
-			}
-		}
+	// 校验 *Tracing
+	if t, ok := o.Ctx.(*Tracing); ok && t != nil {
+		o.parseTracing(t)
 		return
 	}
 }
 
-// 解析Tracing.
-func (o *Line) parseTracing(t *Tracing) {
-	o.SpanId = t.spanId
-	o.SpanVersion = fmt.Sprintf("%s.%d", t.spanVersion, t.Increment())
+// 解析*Tracing.
+func (o *Line) parseTracing(tracing *Tracing) {
+	o.Tracing = tracing
+	o.TracingOffset, _ = tracing.incrOffset()
+}
+
+// 校验是否为context.Context上下文.
+func (o *Line) parseWithContext() bool {
+	c, ok1 := o.Ctx.(context.Context)
+	// interface.
+	if !ok1 || c == nil {
+		return false
+	}
+	// with value
+	if x := c.Value(OpenTracing); x != nil {
+		if t, ok2 := x.(*Tracing); ok2 && t != nil {
+			o.parseTracing(t)
+			return true
+		}
+	}
+	return false
+}
+
+// 校验是否为iris.Context上下文.
+func (o *Line) parseWithIrisContext() bool {
+	c, ok1 := o.Ctx.(iris.Context)
+	// interface.
+	if !ok1 || c == nil {
+		return false
+	}
+	// with value
+	if x := c.Values().Get(OpenTracing); x != nil {
+		if t, ok2 := x.(*Tracing); ok2 && t != nil {
+			o.parseTracing(t)
+			return true
+		}
+	}
+	return false
 }

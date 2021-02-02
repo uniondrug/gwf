@@ -1,102 +1,76 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2021-01-29
+// date: 2021-02-01
 
 package xlog
 
-var (
-	enableDebug = false
-	enableInfo  = false
-	enableWarn  = false
-	enableError = false
-	enableAlert = false
-)
-
 func Debug(text string) {
-	if enableDebug {
+	if Config.DebugOn() {
 		Config.log(nil, DebugLevel, text)
 	}
 }
 
-func Debugf(format string, args ...interface{}) {
-	if enableDebug {
-		Config.log(nil, DebugLevel, format, args...)
+func Debugf(text string, args ...interface{}) {
+	if Config.DebugOn() {
+		Config.log(nil, DebugLevel, text, args...)
 	}
 }
 
-func Debugfc(ctx interface{}, format string, args ...interface{}) {
-	if enableDebug {
-		Config.log(ctx, DebugLevel, format, args...)
+func Debugfc(ctx interface{}, text string, args ...interface{}) {
+	if Config.DebugOn() {
+		Config.log(ctx, DebugLevel, text, args...)
 	}
 }
 
 func Info(text string) {
-	if enableInfo {
+	if Config.InfoOn() {
 		Config.log(nil, InfoLevel, text)
 	}
 }
 
-func Infof(format string, args ...interface{}) {
-	if enableInfo {
-		Config.log(nil, InfoLevel, format, args...)
+func Infof(text string, args ...interface{}) {
+	if Config.InfoOn() {
+		Config.log(nil, InfoLevel, text, args...)
 	}
 }
 
-func Infofc(ctx interface{}, format string, args ...interface{}) {
-	if enableInfo {
-		Config.log(ctx, InfoLevel, format, args...)
+func Infofc(ctx interface{}, text string, args ...interface{}) {
+	if Config.InfoOn() {
+		Config.log(ctx, InfoLevel, text, args...)
 	}
 }
 
 func Warn(text string) {
-	if enableWarn {
+	if Config.WarnOn() {
 		Config.log(nil, WarnLevel, text)
 	}
 }
 
-func Warnf(format string, args ...interface{}) {
-	if enableWarn {
-		Config.log(nil, WarnLevel, format, args...)
+func Warnf(text string, args ...interface{}) {
+	if Config.WarnOn() {
+		Config.log(nil, WarnLevel, text, args...)
 	}
 }
 
-func Warnfc(ctx interface{}, format string, args ...interface{}) {
-	if enableWarn {
-		Config.log(ctx, WarnLevel, format, args...)
+func Warnfc(ctx interface{}, text string, args ...interface{}) {
+	if Config.WarnOn() {
+		Config.log(ctx, WarnLevel, text, args...)
 	}
 }
 
 func Error(text string) {
-	if enableError {
+	if Config.ErrorOn() {
 		Config.log(nil, ErrorLevel, text)
 	}
 }
 
-func Errorf(format string, args ...interface{}) {
-	if enableError {
-		Config.log(nil, ErrorLevel, format, args...)
+func Errorf(text string, args ...interface{}) {
+	if Config.ErrorOn() {
+		Config.log(nil, ErrorLevel, text, args...)
 	}
 }
 
-func Errorfc(ctx interface{}, format string, args ...interface{}) {
-	if enableError {
-		Config.log(ctx, ErrorLevel, format, args...)
-	}
-}
-
-func Alert(text string) {
-	if enableAlert {
-		Config.log(nil, AlertLevel, text)
-	}
-}
-
-func Alertf(format string, args ...interface{}) {
-	if enableAlert {
-		Config.log(nil, AlertLevel, format, args...)
-	}
-}
-
-func Alertfc(ctx interface{}, format string, args ...interface{}) {
-	if enableAlert {
-		Config.log(ctx, AlertLevel, format, args...)
+func Errorfc(ctx interface{}, text string, args ...interface{}) {
+	if Config.ErrorOn() {
+		Config.log(ctx, ErrorLevel, text, args...)
 	}
 }

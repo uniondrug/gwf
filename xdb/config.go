@@ -68,8 +68,7 @@ func (o *configuration) parse() {
 	o.engines.SetMaxIdleConns(o.MaxIdle)
 	o.engines.SetMaxOpenConns(o.MaxOpen)
 	// use specified log adapter.
-	l := &xlog.XDBLogger{}
-	o.engines.SetLogger(l)
+	o.engines.SetLogger(xlog.NewXOrmLog())
 	// fields mapping.
 	if o.Mapper == "same" {
 		o.engines.SetColumnMapper(names.SameMapper{})

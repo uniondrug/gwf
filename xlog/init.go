@@ -1,70 +1,62 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2021-01-29
+// date: 2021-02-01
 
-// Package for framework logger.
 package xlog
 
 import (
 	"sync"
 )
 
+// 适配器定义.
 type LogAdapter int
-type LogLevel int
 
-// 适配器类型.
 const (
-	TermAdapter LogAdapter = iota
-	FileAdapter
+	FileAdapter LogAdapter = iota
 	RedisAdapter
+	TermAdapter
 )
 
-// 日志级别类型.
+var AdapterTexts = map[LogAdapter]string{
+	FileAdapter:  "file",
+	RedisAdapter: "redis",
+	TermAdapter:  "term",
+}
+
+// 日志级别定义.
+type LogLevel int
+
 const (
-	UnknownLevel LogLevel = iota
-	OffLevel
-	AlertLevel
+	OffLevel LogLevel = iota
 	ErrorLevel
 	WarnLevel
 	InfoLevel
 	DebugLevel
 )
 
-// 转让配置.
+var LevelTexts = map[LogLevel]string{
+	OffLevel:   "OFF",
+	ErrorLevel: "ERROR",
+	WarnLevel:  "WARN",
+	InfoLevel:  "INFO",
+	DebugLevel: "DEBUG",
+}
+
+// Handler
+type LogHandler func(line *Line)
+
+// 默认配置.
 const (
-	DefaultAdapter          = TermAdapter
-	DefaultLevel            = InfoLevel
-	DefaultTimeFormat       = "2006-01-02 15:04:05.999999"
-	OpenTracing             = "OpenTracingHandler"
-	OpenTracingParentSpanId = "X-B3-Parentspanid"
-	OpenTracingSpanId       = "X-B3-Spanid"
-	OpenTracingSpanVersion  = "Version"
-	OpenTracingTraceId      = "X-B3-Traceid"
+	DefaultAdapter    = TermAdapter
+	DefaultLevel      = DebugLevel
+	DefaultTimeFormat = "2006-01-02 15:04:05.999999"
 )
 
-var (
-	Config *configuration
-	// 适配器定义.
-	AdapterText = map[LogAdapter]string{
-		TermAdapter:  "term",
-		FileAdapter:  "file",
-		RedisAdapter: "redis",
-	}
-	// 日志级别定义.
-	LevelText = map[LogLevel]string{
-		OffLevel:     "OFF",
-		AlertLevel:   "ALERT",
-		ErrorLevel:   "ERROR",
-		WarnLevel:    "WARN",
-		InfoLevel:    "INFO",
-		DebugLevel:   "DEBUG",
-		UnknownLevel: "UNKNOWN",
-	}
-)
+// 配置结构体.
+var Config *Configuration
 
-// 初始化X-Log.
+// 包级初始化.
 func init() {
 	new(sync.Once).Do(func() {
-		Config = new(configuration)
-		Config.onInit()
+		Config = NewConfiguration()
 	})
 }

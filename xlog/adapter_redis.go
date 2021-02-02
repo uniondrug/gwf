@@ -1,15 +1,16 @@
 // author: wsfuyibing <websearch@163.com>
-// date: 2021-01-30
+// date: 2021-02-01
 
 package xlog
 
-// Redis adapter.
-type RedisLogAdapter struct{}
+// Redis适配器.
+type AdapterRedisHandler struct{}
 
-// New redis adapter struct.
-func NewRedisLogAdapter() *RedisLogAdapter {
-	return &RedisLogAdapter{}
+// 创建Redis适配器结构体.
+func NewAdapterRedisHandler() *AdapterRedisHandler {
+	o := &AdapterRedisHandler{}
+	return o
 }
 
-// Redis adapter handler.
-func (o *RedisLogAdapter) Handler(line *Line) {}
+// 指定Handler回调.
+func (o *AdapterRedisHandler) Handler(line *Line) {}
