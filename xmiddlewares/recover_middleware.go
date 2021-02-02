@@ -11,7 +11,7 @@ import (
 
 	"github.com/kataras/iris/v12"
 
-	"gwf/xlog"
+	"github.com/uniondrug/go-iris/xlog"
 )
 
 // Catch panic.

@@ -7,8 +7,8 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/mvc"
 
-	"gwf/xlog"
-	"gwf/xmiddlewares"
+	"github.com/uniondrug/go-iris/xlog"
+	"github.com/uniondrug/go-iris/xmiddlewares"
 )
 
 type Application struct {

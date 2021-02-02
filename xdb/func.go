@@ -11,7 +11,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"xorm.io/xorm"
 
-	"gwf/xlog"
+	"github.com/uniondrug/go-iris/xlog"
 )
 
 type TransactionHandler func(ctx interface{}, sess *xorm.Session) error

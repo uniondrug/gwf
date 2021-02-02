@@ -9,8 +9,8 @@ import (
 
 	"github.com/kataras/iris/v12"
 
-	"gwf/xapp"
-	"gwf/xlog"
+	"github.com/uniondrug/go-iris/xapp"
+	"github.com/uniondrug/go-iris/xlog"
 )
 
 func TestMainApp(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 
 	"xorm.io/xorm"
 
-	"gwf/xdb"
-	"gwf/xlog"
+	"github.com/uniondrug/go-iris/xdb"
+	"github.com/uniondrug/go-iris/xlog"
 )
 
 func TestXLog(t *testing.T) {

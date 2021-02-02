@@ -6,7 +6,7 @@ package xmiddlewares
 import (
 	"github.com/kataras/iris/v12"
 
-	"gwf/xlog"
+	"github.com/uniondrug/go-iris/xlog"
 )
 
 // 追加OpenTracing控制.
