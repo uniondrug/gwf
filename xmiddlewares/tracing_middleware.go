@@ -13,5 +13,6 @@ import (
 // 本方法用于在创建IRIS服务时, 在最顶层引入.
 func TracingMiddleware(ctx iris.Context) {
 	xlog.NewTracing().UseIris(ctx)
+	xlog.Debugfc(ctx, "middleware:tracing")
 	ctx.Next()
 }

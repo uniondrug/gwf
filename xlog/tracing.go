@@ -59,7 +59,7 @@ func (o *Tracing) UseIris(ctx iris.Context) {
 
 // 使用HTTP请求初始化.
 func (o *Tracing) UseRequest(req *http.Request) {
-
+	o.UseDefault()
 }
 
 // 返回Offset值.

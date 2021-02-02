@@ -1,6 +1,7 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2021-02-01
 
+// Package for framework logger.
 package xlog
 
 import (

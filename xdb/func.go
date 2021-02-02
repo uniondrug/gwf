@@ -73,9 +73,8 @@ func Transaction(ctx interface{}, handlers ...TransactionHandler) (err error) {
 
 // 执行事务.
 //
-// 在事务中必须保证使用同一个连接, 且各回调以串行方式执行.
-//
-// err - 执行不成功, 返回error类型结构, 反之正常执行.
+// 在事务中, DB连接必须保证是同一个连接, 业务执行时串行方式执行. 当返回
+// 值为error类型时, 表示事务执行出错并已回滚.
 //
 //   tracing := xdb.Master()
 //   sess := xdb.MasterContext(tracing)

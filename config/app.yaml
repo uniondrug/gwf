@@ -1,0 +1,4 @@
+# config for application
+Addr: ":8088"
+Name: GoSketch
+Version: "1.0-g"

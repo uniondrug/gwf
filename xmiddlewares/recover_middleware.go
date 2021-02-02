@@ -7,14 +7,16 @@ import (
 	"fmt"
 	"net/http"
 	"runtime"
+	"strings"
 
 	"github.com/kataras/iris/v12"
 
-	"gwf/xlog2"
+	"gwf/xlog"
 )
 
 // Catch panic.
 func RecoverMiddleware(ctx iris.Context) {
+	xlog.Debugfc(ctx, "middleware:recover")
 	defer func() {
 		err := recover()
 		// return if stopped or not panic.
@@ -22,16 +24,16 @@ func RecoverMiddleware(ctx iris.Context) {
 			return
 		}
 		// stack
-		var msg = fmt.Sprintf("%v at %s\n", err, ctx.HandlerName())
-		var sta string
+		var msg = fmt.Sprintf("%v at %s", err, ctx.HandlerName())
+		var sta = ""
 		for i := 1; ; i++ {
 			_, f, l, got := runtime.Caller(i)
 			if !got {
 				break
 			}
-			sta += fmt.Sprintf("%s:%d\n", f, l)
+			sta += fmt.Sprintf(";%s:%d", strings.TrimSpace(f), l)
 		}
-		xlog2.Errorfc(ctx, msg+"\n"+sta)
+		xlog.Errorfc(ctx, msg+"\n"+sta)
 		ctx.StatusCode(http.StatusInternalServerError)
 		ctx.StopExecution()
 	}()
