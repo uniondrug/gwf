@@ -9,7 +9,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/uniondrug/go-iris/xlog"
+	"github.com/uniondrug/gwf/xlog"
 )
 
 const (

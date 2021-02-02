@@ -10,7 +10,7 @@ import (
 
 	"github.com/kataras/iris/v12"
 
-	"github.com/uniondrug/go-iris/xlog"
+	"github.com/uniondrug/gwf/xlog"
 )
 
 func ErrorCode(ctx iris.Context) {

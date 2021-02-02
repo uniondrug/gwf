@@ -8,7 +8,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/uniondrug/go-iris/xapp"
+	"github.com/uniondrug/gwf/xapp"
 )
 
 type Data1 struct {

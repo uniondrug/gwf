@@ -6,7 +6,7 @@ package tests
 import (
 	"testing"
 
-	"github.com/uniondrug/go-iris/xapp"
+	"github.com/uniondrug/gwf/xapp"
 )
 
 type ExampleRequest struct {

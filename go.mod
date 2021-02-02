@@ -1,4 +1,4 @@
-module github.com/uniondrug/go-iris
+module github.com/uniondrug/gwf
 
 go 1.14
 

@@ -8,7 +8,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/uniondrug/go-iris/xlog"
+	"github.com/uniondrug/gwf/xlog"
 )
 
 var (

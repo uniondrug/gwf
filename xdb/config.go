@@ -12,7 +12,7 @@ import (
 	"xorm.io/xorm"
 	"xorm.io/xorm/names"
 
-	"github.com/uniondrug/go-iris/xlog"
+	"github.com/uniondrug/gwf/xlog"
 )
 
 // configuration.
