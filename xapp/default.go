@@ -26,6 +26,10 @@ func New() *Application {
 	return o
 }
 
+func (o *Application) Iris() *iris.Application {
+	return o.app
+}
+
 func (o *Application) RegisterController(path string, handler interface{}) *Application {
 	mvc.Configure(o.app.Party(path), func(m *mvc.Application) {
 		m.Handle(handler)
