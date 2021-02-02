@@ -11,6 +11,7 @@ import (
 	i18nTranslator "github.com/go-playground/universal-translator"
 	i18nValidator "github.com/go-playground/validator/v10"
 	i18nTranslations "github.com/go-playground/validator/v10/translations/zh"
+	"github.com/kataras/iris/v12"
 )
 
 // 校验结构体.
@@ -48,4 +49,12 @@ func Validate(s interface{}) error {
 		}
 	}
 	return nil
+}
+
+// 校验IRIS.
+func ValidateIris(ctx iris.Context, s interface{}) error {
+	if err := ctx.ReadJSON(s); err != nil {
+		return err
+	}
+	return Validate(s)
 }
