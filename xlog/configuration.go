@@ -12,16 +12,20 @@ import (
 
 // 日志配置.
 type Configuration struct {
-	AdapterName string `yaml:"adapter-name"`
-	LevelName   string `yaml:"level-name"`
-	TimeFormat  string `yaml:"time-format"`
-	adapter     LogAdapter
-	handler     LogHandler
-	level       LogLevel
-	_debug      bool
-	_info       bool
-	_warn       bool
-	_error      bool
+	AdapterName  string `yaml:"adapter-name"`
+	LevelName    string `yaml:"level-name"`
+	TimeFormat   string `yaml:"time-format"`
+	TraceId      string `yaml:"trace-id"`
+	SpanId       string `yaml:"span-id"`
+	SpanVersion  string `yaml:"span-version"`
+	ParentSpanId string `yaml:"parent-span-id"`
+	adapter      LogAdapter
+	handler      LogHandler
+	level        LogLevel
+	_debug       bool
+	_info        bool
+	_warn        bool
+	_error       bool
 }
 
 // 创建日志配置结构体.
@@ -100,6 +104,18 @@ func (o *Configuration) LoadYaml(path string) error {
 		o.TimeFormat = DefaultTimeFormat
 	}
 	// 6. 完成.
+	if o.ParentSpanId == "" {
+		o.ParentSpanId = DefaultParentSpanId
+	}
+	if o.SpanId == "" {
+		o.SpanId = DefaultSpanId
+	}
+	if o.SpanVersion == "" {
+		o.SpanVersion = DefaultSpanVersion
+	}
+	if o.TraceId == "" {
+		o.TraceId = DefaultTraceId
+	}
 	return nil
 }
 

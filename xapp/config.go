@@ -21,9 +21,9 @@ const (
 var Config *config
 
 type config struct {
-	Addr    string `yaml:"Addr"`
-	Name    string `yaml:"Name"`
-	Version string `yaml:"Version"`
+	Addr    string `yaml:"addr"`
+	Name    string `yaml:"name"`
+	Version string `yaml:"version"`
 }
 
 func (o *config) LoadYaml(path string) error {

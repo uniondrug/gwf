@@ -28,7 +28,8 @@ type Tracing struct {
 }
 
 func NewTracing() *Tracing {
-	o := &Tracing{spanOffset: 0}
+	o := &Tracing{spanOffset: 0, spanVersion: "0"}
+	o.spanId = o.UUID()
 	return o
 }
 
@@ -45,8 +46,6 @@ func (o *Tracing) UUID() string {
 
 // 使用默认值初始化.
 func (o *Tracing) UseDefault() *Tracing {
-	o.spanId = o.UUID()
-	o.spanVersion = "0"
 	o.traceId = o.spanId
 	return o
 }
@@ -59,7 +58,20 @@ func (o *Tracing) UseIris(ctx iris.Context) {
 
 // 使用HTTP请求初始化.
 func (o *Tracing) UseRequest(req *http.Request) {
-	o.UseDefault()
+	// 1. assign parent span id
+	if s := req.Header.Get(o.spanId); s != "" {
+		o.parentSpanId = s
+	}
+	// 2. span version
+	if s := req.Header.Get(o.spanVersion); s != "" {
+		o.spanVersion = s
+	}
+	// 3. trace id
+	if s := req.Header.Get(o.traceId); s != "" {
+		o.traceId = s
+	} else {
+		o.traceId = o.spanId
+	}
 }
 
 // 返回Offset值.

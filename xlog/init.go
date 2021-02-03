@@ -47,9 +47,13 @@ type LogHandler func(line *Line)
 
 // 默认配置.
 const (
-	DefaultAdapter    = TermAdapter
-	DefaultLevel      = DebugLevel
-	DefaultTimeFormat = "2006-01-02 15:04:05.999999"
+	DefaultAdapter      = TermAdapter
+	DefaultLevel        = DebugLevel
+	DefaultTimeFormat   = "2006-01-02 15:04:05.999999"
+	DefaultParentSpanId = "X-B3-Parentspanid"
+	DefaultSpanId       = "X-B3-Spanid"
+	DefaultSpanVersion  = "Version"
+	DefaultTraceId      = "X-B3-Traceid"
 )
 
 // 配置结构体.
