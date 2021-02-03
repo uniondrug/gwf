@@ -16,7 +16,6 @@ import (
 
 // Catch panic.
 func RecoverMiddleware(ctx iris.Context) {
-	xlog.Debugfc(ctx, "middleware:recover")
 	defer func() {
 		err := recover()
 		// return if stopped or not panic.

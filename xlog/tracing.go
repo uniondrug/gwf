@@ -35,6 +35,10 @@ func NewTracing() *Tracing {
 	return o
 }
 
+func (o *Tracing) TraceId() string {
+	return o.traceId
+}
+
 // Return unique identify.
 func (o *Tracing) UUID() string {
 	// 1. 通过UUID包获取.
@@ -77,6 +81,8 @@ func (o *Tracing) UseRequest(req *http.Request) {
 	// 4. http info
 	o.method = req.Method
 	o.uri = req.RequestURI
+	// 5. assign header
+	req.Header.Set(Config.TraceId, o.traceId)
 }
 
 // 返回Offset值.
