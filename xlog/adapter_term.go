@@ -35,6 +35,9 @@ func (o *AdapterTermHandler) Handler(line *Line) {
 	// 2. Tracing链.
 	if line.Tracing != nil {
 		s += fmt.Sprintf("[s=%s][v=%s]", line.Tracing.spanId, fmt.Sprintf("%s.%d", line.Tracing.spanVersion, line.TracingOffset))
+		if line.Tracing.method != "" {
+			s += fmt.Sprintf("[m=%s][u=%s]", line.Tracing.method, line.Tracing.uri)
+		}
 	}
 	// 3. 日志内容.
 	if line.Args != nil && len(line.Args) > 0 {

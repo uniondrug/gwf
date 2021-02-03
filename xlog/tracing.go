@@ -25,6 +25,8 @@ type Tracing struct {
 	spanOffset   int32
 	spanVersion  string
 	traceId      string
+	method       string
+	uri          string
 }
 
 func NewTracing() *Tracing {
@@ -72,6 +74,9 @@ func (o *Tracing) UseRequest(req *http.Request) {
 	} else {
 		o.traceId = o.spanId
 	}
+	// 4. http info
+	o.method = req.Method
+	o.uri = req.RequestURI
 }
 
 // 返回Offset值.
