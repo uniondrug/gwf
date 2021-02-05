@@ -83,7 +83,7 @@ import (
             1. `GetById(id int64) (*Example, error)`
             1. `ListByStatus(status int, limit, page int) ([]*Example, error)`
         1. 写方法
-            1. `Add(req *Example)`
+            1. `Add(req *Example) error`
             1. `SetStatusAsEnabled(model *Example) error`
 1. 控制器/Controller.
     1. 文件位于 `app/controllers` 目录下.
@@ -110,3 +110,5 @@ import (
 1. 应用
     1. Logger.
     1. 事务
+    1. context.Context
+    1. channel
