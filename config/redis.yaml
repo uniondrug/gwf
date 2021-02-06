@@ -1,0 +1,7 @@
+#
+# Configuration for redis.
+#
+addr: "127.0.0.1:6379"
+password: ""
+max-active: 5
+max-idle: 500
